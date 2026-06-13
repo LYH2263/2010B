@@ -78,6 +78,10 @@ export default function OrderShow() {
         </div>
         <div className="flex items-center gap-2">
           <Link to="/orders" className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium">返回列表</Link>
+          <Link to={'/orders/' + id + '/print'} className="bg-white border border-primary text-primary hover:bg-primary-light px-4 py-2 rounded-lg font-medium flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clipRule="evenodd" /></svg>
+            打印发货单
+          </Link>
           {shipment && <Link to={'/shipments/' + shipment.id} className="bg-primary-light hover:bg-orange-100 text-primary px-4 py-2 rounded-lg font-medium">运单详情</Link>}
         </div>
       </div>

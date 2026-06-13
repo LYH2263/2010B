@@ -18,6 +18,7 @@ import TagEdit from './pages/TagEdit'
 import OrderList from './pages/OrderList'
 import OrderCreate from './pages/OrderCreate'
 import OrderShow from './pages/OrderShow'
+import OrderPrint from './pages/OrderPrint'
 import InventoryList from './pages/InventoryList'
 import InventoryAdjust from './pages/InventoryAdjust'
 import BestsellerList from './pages/BestsellerList'
@@ -114,6 +115,7 @@ function AppRoutes() {
                   <Route path="/orders" element={<OrderList />} />
                   <Route path="/orders/create" element={<OrderCreate />} />
                   <Route path="/orders/:id" element={<OrderShow />} />
+                  <Route path="/orders/:id/print" element={<OrderPrint />} />
                   <Route path="/inventory" element={<InventoryList />} />
                   <Route path="/inventory/:productId/adjust" element={<InventoryAdjust />} />
                   <Route path="/stock-takes" element={<StockTakeList />} />

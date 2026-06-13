@@ -65,6 +65,7 @@ class OrderService
                 $orderItems[] = [
                     'product_id' => $product->id,
                     'product_name' => $product->name,
+                    'product_sku' => $product->sku,
                     'price' => $product->price,
                     'quantity' => $qty,
                     'subtotal' => $subtotal,

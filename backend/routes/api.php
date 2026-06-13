@@ -12,6 +12,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PointController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\PrintController;
 use App\Http\Controllers\StockTakeController;
 use App\Http\Controllers\TrashController;
 use Illuminate\Support\Facades\Route;
@@ -99,4 +100,7 @@ Route::post('trash/products/{id}/restore', [TrashController::class, 'restoreProd
 Route::post('trash/categories/{id}/restore', [TrashController::class, 'restoreCategory']);
 Route::delete('trash/products/{id}/force', [TrashController::class, 'forceDeleteProduct']);
 Route::delete('trash/categories/{id}/force', [TrashController::class, 'forceDeleteCategory']);
+
+Route::get('orders/{id}/print', [PrintController::class, 'printData']);
+Route::get('orders/{id}/export-html', [PrintController::class, 'exportHtml']);
 });

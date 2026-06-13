@@ -740,3 +740,16 @@ export async function forceDeleteCategory(id) {
     throw new Error(j.message || await r.text());
   }
 }
+
+export async function getOrderPrintData(id) {
+  const r = await fetch(BASE + '/orders/' + id + '/print', { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export function getOrderExportHtmlUrl(id) {
+  return BASE + '/orders/' + id + '/export-html';
+}
