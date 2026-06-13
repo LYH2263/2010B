@@ -7,6 +7,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\PointController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // 公开路由（无需认证）
@@ -42,4 +44,14 @@ Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus']);
 Route::get('inventory', [InventoryController::class, 'index']);
 Route::get('inventory/{product}/adjust', [InventoryController::class, 'adjust']);
 Route::post('inventory/{product}/adjust', [InventoryController::class, 'doAdjust']);
+
+Route::get('points', [PointController::class, 'index']);
+Route::get('points/{account}', [PointController::class, 'show']);
+Route::post('points/{account}/adjust', [PointController::class, 'adjust']);
+Route::get('points/user/{user}', [PointController::class, 'showByUser']);
+Route::post('points/user/{user}/adjust', [PointController::class, 'adjustByUser']);
+Route::get('points/ranking', [PointController::class, 'ranking']);
+
+Route::get('users', [UserController::class, 'index']);
+Route::get('users/{id}', [UserController::class, 'show']);
 });

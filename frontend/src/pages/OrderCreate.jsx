@@ -1,19 +1,28 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { getProductsOnSale, createOrder } from '../api'
+import { getProductsOnSale, createOrder, getUsersAll } from '../api'
 import { useToast } from '../contexts/ToastContext'
 
 export default function OrderCreate() {
   const navigate = useNavigate()
   const { showToast } = useToast()
   const [products, setProducts] = useState([])
+  const [users, setUsers] = useState([])
   const [quantities, setQuantities] = useState({})
+  const [userId, setUserId] = useState('')
   const [remark, setRemark] = useState('')
   const [err, setErr] = useState(null)
 
-  const load = () => getProductsOnSale().then((data) => {
-    setProducts(Array.isArray(data) ? data : (data.data ?? []))
-  }).catch((e) => { setErr(e.message); showToast(e.message) })
+  const load = () => {
+    return Promise.all([
+      getProductsOnSale().then((data) => {
+        setProducts(Array.isArray(data) ? data : (data.data ?? []))
+      }),
+      getUsersAll().then((data) => {
+        setUsers(Array.isArray(data) ? data : (data.data ?? []))
+      }).catch(() => setUsers([]))
+    ]).catch((e) => { setErr(e.message); showToast(e.message) })
+  }
 
   useEffect(() => { load() }, [])
 
@@ -26,7 +35,9 @@ export default function OrderCreate() {
       showToast('请至少选择一件商品并填写数量')
       return
     }
-    createOrder({ items, remark })
+    const data = { items, remark }
+    if (userId) data.user_id = Number(userId)
+    createOrder(data)
       .then((order) => { showToast('订单已创建', 'success'); navigate('/orders/' + order.id) })
       .catch((e) => showToast(e.message))
   }
@@ -46,6 +57,20 @@ export default function OrderCreate() {
       </div>
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md border-2 border-gray-200 p-6 sm:p-8 max-w-2xl">
         <div className="space-y-5">
+          <div>
+            <label className="block text-base font-semibold text-gray-800 mb-1.5">关联客户（选填）</label>
+            <select
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              className="block w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2.5 text-base text-gray-800 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+            >
+              <option value="">不关联客户（不计算积分）</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">关联客户后，订单付款时将自动计算并发放积分</p>
+          </div>
           <div>
             <label className="block text-base font-semibold text-gray-800 mb-2">选择商品与数量</label>
             <div className="space-y-3">

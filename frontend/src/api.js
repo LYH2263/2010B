@@ -261,6 +261,81 @@ export async function getBestsellers(params = {}) {
   return r.json();
 }
 
+export async function getPoints(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/points' + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getPointAccount(accountId, params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/points/' + accountId + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getPointAccountByUser(userId, params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/points/user/' + userId + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function adjustPoints(accountId, delta, reason) {
+  const r = await fetch(BASE + '/points/' + accountId + '/adjust', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify({ delta, reason }),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function adjustPointsByUser(userId, delta, reason) {
+  const r = await fetch(BASE + '/points/user/' + userId + '/adjust', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify({ delta, reason }),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function getUsers(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/users' + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getUsersAll() {
+  const data = await getUsers({ per_page: 100 });
+  return data.data ?? data ?? [];
+}
+
 export async function getProductsOnSale() {
   const r = await fetch(BASE + '/products?per_page=100', { headers: headers(), credentials: 'include' });
   if (!r.ok) {

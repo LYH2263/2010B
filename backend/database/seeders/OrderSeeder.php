@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -14,6 +15,11 @@ class OrderSeeder extends Seeder
     {
         $products = Product::all();
         if ($products->isEmpty()) {
+            return;
+        }
+
+        $users = User::where('email', '!=', 'admin@example.com')->get();
+        if ($users->isEmpty()) {
             return;
         }
 
@@ -63,6 +69,7 @@ class OrderSeeder extends Seeder
                     'order_no' => $orderNo,
                     'status' => $status,
                     'total_amount' => round($total, 2),
+                    'user_id' => $users->random()->id,
                     'remark' => $orderIndex <= 3 ? '演示订单' : null,
                     'created_at' => $date->copy()->addHours(random_int(8, 20))->addMinutes(random_int(0, 59)),
                     'updated_at' => $date->copy()->addHours(random_int(8, 20))->addMinutes(random_int(0, 59)),

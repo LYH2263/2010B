@@ -18,6 +18,8 @@ import OrderShow from './pages/OrderShow'
 import InventoryList from './pages/InventoryList'
 import InventoryAdjust from './pages/InventoryAdjust'
 import BestsellerList from './pages/BestsellerList'
+import PointsList from './pages/PointsList'
+import MemberShow from './pages/MemberShow'
 
 function Layout({ children }) {
   const { user, logout } = useAuth()
@@ -42,6 +44,7 @@ function Layout({ children }) {
                 <NavLink to="/orders" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>订单</NavLink>
                 <NavLink to="/inventory" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>库存</NavLink>
                 <NavLink to="/bestsellers" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>畅销榜</NavLink>
+                <NavLink to="/points" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>积分</NavLink>
               </div>
             </div>
             {user && (
@@ -95,6 +98,8 @@ function AppRoutes() {
                   <Route path="/inventory" element={<InventoryList />} />
                   <Route path="/inventory/:productId/adjust" element={<InventoryAdjust />} />
                   <Route path="/bestsellers" element={<BestsellerList />} />
+                  <Route path="/points" element={<PointsList />} />
+                  <Route path="/members/:userId" element={<MemberShow />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </ProtectedRoute>

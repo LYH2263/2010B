@@ -57,6 +57,24 @@ export default function OrderShow() {
           <div><dt className="text-gray-500 text-sm">订单号</dt><dd className="font-medium text-gray-800 mt-0.5">{order.order_no}</dd></div>
           <div><dt className="text-gray-500 text-sm">总金额</dt><dd className="text-primary font-bold text-lg mt-0.5">¥{Number(order.total_amount).toFixed(2)}</dd></div>
           <div><dt className="text-gray-500 text-sm">创建时间</dt><dd className="mt-0.5">{order.created_at ? new Date(order.created_at).toLocaleString() : '-'}</dd></div>
+          <div>
+            <dt className="text-gray-500 text-sm">关联客户</dt>
+            <dd className="mt-0.5">
+              {order.user ? (
+                <Link to={'/members/' + order.user.id} className="text-primary hover:underline font-medium">
+                  {order.user.name}
+                </Link>
+              ) : (
+                <span className="text-gray-400">无</span>
+              )}
+            </dd>
+          </div>
+          {order.earned_points !== undefined && order.earned_points > 0 && (
+            <div>
+              <dt className="text-gray-500 text-sm">获得积分</dt>
+              <dd className="mt-0.5 text-green-600 font-medium">+{order.earned_points}</dd>
+            </div>
+          )}
           {order.remark && <div className="sm:col-span-2"><dt className="text-gray-500 text-sm">备注</dt><dd className="mt-0.5 text-gray-700">{order.remark}</dd></div>}
         </dl>
       </div>

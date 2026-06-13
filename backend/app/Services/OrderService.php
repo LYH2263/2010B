@@ -5,17 +5,21 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class OrderService
 {
+    public function __construct(
+        private PointService $pointService
+    ) {}
     /**
      * @param array{filters?: array{order_no?: string, date_from?: string, date_to?: string}} $options
      */
     public function list(int $perPage = 15, ?string $status = null, array $options = []): LengthAwarePaginator
     {
-        $q = Order::with('items')->orderBy('id', 'desc');
+        $q = Order::with(['items', 'user'])->orderBy('id', 'desc');
         if ($status !== null && $status !== '') {
             $q->where('status', $status);
         }
@@ -76,6 +80,7 @@ class OrderService
                 'order_no' => $orderNo,
                 'status' => Order::STATUS_PENDING,
                 'total_amount' => $total,
+                'user_id' => $data['user_id'] ?? null,
                 'remark' => $data['remark'] ?? null,
             ]);
 
@@ -100,6 +105,12 @@ class OrderService
             foreach ($order->items as $item) {
                 $item->product()->increment('stock', $item->quantity);
             }
+            if ($order->status === Order::STATUS_PAID || $order->status === Order::STATUS_SHIPPED) {
+                $this->pointService->refundForOrder($order);
+            }
+        }
+        if ($status === Order::STATUS_PAID && $order->status !== Order::STATUS_PAID) {
+            $this->pointService->earnFromOrder($order);
         }
         $order->update(['status' => $status]);
         return $order;
@@ -107,6 +118,6 @@ class OrderService
 
     public function find(int $id): ?Order
     {
-        return Order::with('items.product')->find($id);
+        return Order::with(['items.product', 'user'])->find($id);
     }
 }
