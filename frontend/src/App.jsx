@@ -26,6 +26,8 @@ import PriceHistoryList from './pages/PriceHistoryList'
 import MemberShow from './pages/MemberShow'
 import ShipmentList from './pages/ShipmentList'
 import ShipmentShow from './pages/ShipmentShow'
+import StockTakeList from './pages/StockTakeList'
+import StockTakeShow from './pages/StockTakeShow'
 
 function Layout({ children }) {
   const { user, logout } = useAuth()
@@ -50,6 +52,7 @@ function Layout({ children }) {
                 <NavLink to="/tags" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>标签</NavLink>
                 <NavLink to="/orders" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>订单</NavLink>
                 <NavLink to="/inventory" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>库存</NavLink>
+                <NavLink to="/stock-takes" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>盘点</NavLink>
                 <NavLink to="/bestsellers" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>畅销榜</NavLink>
                 <NavLink to="/points" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>积分</NavLink>
                 <NavLink to="/shipments" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>运单</NavLink>
@@ -109,6 +112,8 @@ function AppRoutes() {
                   <Route path="/orders/:id" element={<OrderShow />} />
                   <Route path="/inventory" element={<InventoryList />} />
                   <Route path="/inventory/:productId/adjust" element={<InventoryAdjust />} />
+                  <Route path="/stock-takes" element={<StockTakeList />} />
+                  <Route path="/stock-takes/:id" element={<StockTakeShow />} />
                   <Route path="/bestsellers" element={<BestsellerList />} />
                   <Route path="/points" element={<PointsList />} />
                   <Route path="/price-histories" element={<PriceHistoryList />} />

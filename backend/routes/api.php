@@ -12,6 +12,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PointController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\StockTakeController;
 use Illuminate\Support\Facades\Route;
 
 // 公开路由（无需认证）
@@ -81,4 +82,10 @@ Route::get('shipments/{id}', [ShipmentController::class, 'show']);
 Route::post('shipments/{shipment}/tracks', [ShipmentController::class, 'addTrack']);
 Route::patch('shipments/{shipment}/status', [ShipmentController::class, 'updateStatus']);
 Route::get('shipments/order/{order}', [ShipmentController::class, 'byOrder']);
+
+Route::get('stock-takes', [StockTakeController::class, 'index']);
+Route::post('stock-takes', [StockTakeController::class, 'store']);
+Route::get('stock-takes/{id}', [StockTakeController::class, 'show']);
+Route::patch('stock-takes/{stockTakeId}/items/{itemId}', [StockTakeController::class, 'updateItem']);
+Route::post('stock-takes/{id}/complete', [StockTakeController::class, 'complete']);
 });

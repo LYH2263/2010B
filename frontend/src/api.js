@@ -563,3 +563,66 @@ export async function getShipmentByOrder(orderId) {
   }
   return r.json();
 }
+
+export async function getStockTakes(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/stock-takes' + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getStockTake(id) {
+  const r = await fetch(BASE + '/stock-takes/' + id, { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function createStockTake(data = {}) {
+  const r = await fetch(BASE + '/stock-takes', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function updateStockTakeItem(stockTakeId, itemId, actualQuantity) {
+  const r = await fetch(BASE + '/stock-takes/' + stockTakeId + '/items/' + itemId, {
+    method: 'PATCH',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify({ actual_quantity: actualQuantity }),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function completeStockTake(id) {
+  const r = await fetch(BASE + '/stock-takes/' + id + '/complete', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
