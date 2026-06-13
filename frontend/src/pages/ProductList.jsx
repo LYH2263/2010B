@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { getProducts, getCategoriesAll, deleteProduct, getTagsAll } from '../api'
+import { getProducts, getCategoriesAll, deleteProduct, getTagsAll, getProductExportCsvUrl } from '../api'
 import Pagination from '../components/Pagination'
 import BatchPriceChange from '../components/BatchPriceChange'
+import ProductImportExportDialog from '../components/ProductImportExportDialog'
 import { useToast } from '../contexts/ToastContext'
 import { useConfirmDialog } from '../contexts/ConfirmDialogContext'
 
@@ -28,6 +29,7 @@ export default function ProductList() {
   const [tagSearch, setTagSearch] = useState('')
   const [selectedProductIds, setSelectedProductIds] = useState([])
   const [showBatchPrice, setShowBatchPrice] = useState(false)
+  const [showImport, setShowImport] = useState(false)
   const tagDropdownRef = useRef(null)
 
   const load = (p = page) => {
@@ -157,6 +159,23 @@ export default function ProductList() {
             </button>
           )}
           <Link to="/products/create" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg font-medium shrink-0">新增商品</Link>
+          <a
+            href={getProductExportCsvUrl({
+              ...(appliedCategoryId ? { category_id: appliedCategoryId } : {}),
+              ...(appliedKeyword ? { keyword: appliedKeyword } : {}),
+              ...(appliedTagIds.length > 0 ? { tag_ids: appliedTagIds.join(','), tag_mode: appliedTagMode } : {}),
+            })}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium shrink-0 text-sm"
+          >
+            导出 CSV
+          </a>
+          <button
+            type="button"
+            onClick={() => setShowImport(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shrink-0 text-sm"
+          >
+            批量导入
+          </button>
         </div>
       </div>
 
@@ -414,6 +433,13 @@ export default function ProductList() {
           selectedProducts={selectedProducts}
           onClose={() => setShowBatchPrice(false)}
           onSuccess={handleBatchPriceSuccess}
+        />
+      )}
+
+      {showImport && (
+        <ProductImportExportDialog
+          onClose={() => setShowImport(false)}
+          onSuccess={() => { load(page) }}
         />
       )}
     </div>

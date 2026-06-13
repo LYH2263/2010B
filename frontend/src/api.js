@@ -753,3 +753,47 @@ export async function getOrderPrintData(id) {
 export function getOrderExportHtmlUrl(id) {
   return BASE + '/orders/' + id + '/export-html';
 }
+
+export function getProductExportCsvUrl(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  return BASE + '/products/export-csv' + (q ? '?' + q : '');
+}
+
+export function getProductImportTemplateUrl() {
+  return BASE + '/products/import-template';
+}
+
+export async function validateProductImport(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const r = await fetch(BASE + '/products/import-validate', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    credentials: 'include',
+    body: formData,
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text().catch(() => '校验失败'));
+  }
+  return r.json();
+}
+
+export async function confirmProductImport(rows, strategy) {
+  const r = await fetch(BASE + '/products/import-confirm', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify({ rows, strategy }),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text().catch(() => '导入失败'));
+  }
+  return r.json();
+}

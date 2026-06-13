@@ -15,6 +15,7 @@ use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\StockTakeController;
 use App\Http\Controllers\TrashController;
+use App\Http\Controllers\ProductImportExportController;
 use Illuminate\Support\Facades\Route;
 
 // 公开路由（无需认证）
@@ -28,7 +29,11 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('bestsellers', [BestsellerController::class, 'index']);
 Route::get('products', [ProductController::class, 'index']);
 Route::get('products/create', [ProductController::class, 'create']);
+Route::get('products/export-csv', [ProductImportExportController::class, 'exportCsv']);
+Route::get('products/import-template', [ProductImportExportController::class, 'downloadTemplate']);
 Route::post('products', [ProductController::class, 'store']);
+Route::post('products/import-validate', [ProductImportExportController::class, 'validateImport']);
+Route::post('products/import-confirm', [ProductImportExportController::class, 'confirmImport']);
 Route::get('products/{id}', [ProductController::class, 'show']);
 Route::get('products/{id}/edit', [ProductController::class, 'edit']);
 Route::put('products/{id}', [ProductController::class, 'update']);
