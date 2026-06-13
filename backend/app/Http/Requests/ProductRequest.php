@@ -22,6 +22,8 @@ class ProductRequest extends FormRequest
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['nullable', 'integer', 'min:0'],
             'status' => ['nullable', 'in:0,1'],
+            'tag_ids' => ['nullable', 'array'],
+            'tag_ids.*' => ['integer', 'exists:tags,id'],
         ];
     }
 
@@ -34,6 +36,7 @@ class ProductRequest extends FormRequest
             'price' => '单价',
             'stock' => '库存',
             'status' => '状态',
+            'tag_ids' => '标签',
         ];
     }
 }

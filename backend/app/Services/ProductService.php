@@ -4,15 +4,16 @@ namespace App\Services;
 
 use App\Models\Product;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ProductService
 {
     /**
-     * @param array{filters?: array{keyword?: string}} $options
+     * @param array{filters?: array{keyword?: string, tag_ids?: int[], tag_mode?: string}} $options
      */
     public function list(?int $categoryId = null, int $perPage = 15, array $options = []): LengthAwarePaginator
     {
-        $q = Product::with('category')->orderBy('id', 'desc');
+        $q = Product::with(['category', 'tags'])->orderBy('id', 'desc');
         if ($categoryId !== null) {
             $q->where('category_id', $categoryId);
         }
@@ -23,18 +24,49 @@ class ProductService
                 $q->where('name', 'like', '%' . $kw . '%')->orWhere('sku', 'like', '%' . $kw . '%');
             });
         }
+        if (!empty($filters['tag_ids']) && is_array($filters['tag_ids'])) {
+            $tagIds = array_values(array_filter($filters['tag_ids'], 'is_numeric'));
+            $tagIds = array_map('intval', $tagIds);
+            if (!empty($tagIds)) {
+                $mode = $filters['tag_mode'] ?? 'any';
+                if ($mode === 'all') {
+                    $q->whereHas('tags', function ($subQ) use ($tagIds) {
+                        $subQ->whereIn('tags.id', $tagIds);
+                    }, '=', count($tagIds));
+                } else {
+                    $q->whereHas('tags', function ($subQ) use ($tagIds) {
+                        $subQ->whereIn('tags.id', $tagIds);
+                    });
+                }
+            }
+        }
         return $q->paginate($perPage);
     }
 
     public function create(array $data): Product
     {
-        return Product::create($data);
+        return DB::transaction(function () use ($data) {
+            $tagIds = $data['tag_ids'] ?? null;
+            unset($data['tag_ids']);
+            $product = Product::create($data);
+            if (is_array($tagIds)) {
+                $product->tags()->sync($tagIds);
+            }
+            return $product->load(['category', 'tags']);
+        });
     }
 
     public function update(Product $product, array $data): Product
     {
-        $product->update($data);
-        return $product;
+        return DB::transaction(function () use ($product, $data) {
+            $tagIds = $data['tag_ids'] ?? null;
+            unset($data['tag_ids']);
+            $product->update($data);
+            if (is_array($tagIds)) {
+                $product->tags()->sync($tagIds);
+            }
+            return $product->fresh()->load(['category', 'tags']);
+        });
     }
 
     public function delete(Product $product): void
@@ -44,11 +76,11 @@ class ProductService
 
     public function find(int $id): ?Product
     {
-        return Product::with('category')->find($id);
+        return Product::with(['category', 'tags'])->find($id);
     }
 
     public function onSaleProducts(): \Illuminate\Database\Eloquent\Collection
     {
-        return Product::onSale()->orderBy('id')->get();
+        return Product::onSale()->with('tags')->orderBy('id')->get();
     }
 }

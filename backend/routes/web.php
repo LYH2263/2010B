@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\BestsellerController;
 use App\Http\Controllers\InventoryController;
@@ -16,6 +17,7 @@ Route::get('bestsellers', [BestsellerController::class, 'index'])->name('bestsel
 
 Route::resource('products', ProductController::class);
 Route::resource('categories', CategoryController::class)->except(['show']);
+Route::resource('tags', TagController::class)->except(['show']);
 
 Route::resource('orders', OrderController::class)->except(['edit', 'update']);
 Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');

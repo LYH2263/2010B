@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
 use App\Services\ProductService;
+use App\Services\CategoryService;
+use App\Services\TagService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +25,17 @@ class ProductController extends Controller
         if (is_string($keyword) && trim($keyword) !== '') {
             $filters['keyword'] = trim($keyword);
         }
+        $tagIds = $request->query('tag_ids');
+        if (is_string($tagIds)) {
+            $tagIds = explode(',', $tagIds);
+        }
+        if (is_array($tagIds)) {
+            $filters['tag_ids'] = $tagIds;
+        }
+        $tagMode = $request->query('tag_mode');
+        if (is_string($tagMode) && in_array($tagMode, ['any', 'all'], true)) {
+            $filters['tag_mode'] = $tagMode;
+        }
         $products = $this->productService->list($categoryId, $perPage, ['filters' => $filters]);
 
         if ($request->expectsJson()) {
@@ -34,9 +47,15 @@ class ProductController extends Controller
     public function create(Request $request): \Illuminate\View\View|JsonResponse
     {
         if ($request->expectsJson()) {
-            return response()->json(['categories' => (new \App\Services\CategoryService())->allForSelect()]);
+            return response()->json([
+                'categories' => (new CategoryService())->allForSelect(),
+                'tags' => (new TagService())->allForSelect(),
+            ]);
         }
-        return view('products.create', ['categories' => (new \App\Services\CategoryService())->allForSelect()]);
+        return view('products.create', [
+            'categories' => (new CategoryService())->allForSelect(),
+            'tags' => (new TagService())->allForSelect(),
+        ]);
     }
 
     public function store(ProductRequest $request): JsonResponse|\Illuminate\Http\RedirectResponse
@@ -44,7 +63,7 @@ class ProductController extends Controller
         try {
             $product = $this->productService->create($request->validated());
             if ($request->expectsJson()) {
-                return response()->json($product->load('category'), 201);
+                return response()->json($product, 201);
             }
             return redirect()->route('products.show', $product)->with('success', '商品已创建');
         } catch (\Throwable $e) {
@@ -83,12 +102,14 @@ class ProductController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'product' => $product,
-                'categories' => (new \App\Services\CategoryService())->allForSelect(),
+                'categories' => (new CategoryService())->allForSelect(),
+                'tags' => (new TagService())->allForSelect(),
             ]);
         }
         return view('products.edit', [
             'product' => $product,
-            'categories' => (new \App\Services\CategoryService())->allForSelect(),
+            'categories' => (new CategoryService())->allForSelect(),
+            'tags' => (new TagService())->allForSelect(),
         ]);
     }
 
@@ -104,7 +125,7 @@ class ProductController extends Controller
         try {
             $this->productService->update($product, $request->validated());
             if ($request->expectsJson()) {
-                return response()->json($product->fresh()->load('category'));
+                return response()->json($product->fresh()->load(['category', 'tags']));
             }
             return redirect()->route('products.show', $product)->with('success', '已更新');
         } catch (\Throwable $e) {

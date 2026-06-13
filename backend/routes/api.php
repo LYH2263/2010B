@@ -5,6 +5,7 @@ use App\Http\Controllers\BestsellerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PointController;
@@ -34,6 +35,16 @@ Route::post('categories', [CategoryController::class, 'store']);
 Route::get('categories/{id}/edit', [CategoryController::class, 'edit']);
 Route::put('categories/{id}', [CategoryController::class, 'update']);
 Route::delete('categories/{id}', [CategoryController::class, 'destroy']);
+
+Route::get('tags', [TagController::class, 'index']);
+Route::get('tags/all', [TagController::class, 'all']);
+Route::get('tags/for-select', [TagController::class, 'forSelect']);
+Route::post('tags/find-or-create', [TagController::class, 'findOrCreate']);
+Route::get('tags/create', [TagController::class, 'create']);
+Route::post('tags', [TagController::class, 'store']);
+Route::get('tags/{id}/edit', [TagController::class, 'edit']);
+Route::put('tags/{id}', [TagController::class, 'update']);
+Route::delete('tags/{id}', [TagController::class, 'destroy']);
 
 Route::get('orders', [OrderController::class, 'index']);
 Route::get('orders/create', [OrderController::class, 'create']);

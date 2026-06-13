@@ -12,6 +12,9 @@ import ProductShow from './pages/ProductShow'
 import CategoryList from './pages/CategoryList'
 import CategoryCreate from './pages/CategoryCreate'
 import CategoryEdit from './pages/CategoryEdit'
+import TagList from './pages/TagList'
+import TagCreate from './pages/TagCreate'
+import TagEdit from './pages/TagEdit'
 import OrderList from './pages/OrderList'
 import OrderCreate from './pages/OrderCreate'
 import OrderShow from './pages/OrderShow'
@@ -41,6 +44,7 @@ function Layout({ children }) {
                 <NavLink to="/" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>仪表盘</NavLink>
                 <NavLink to="/products" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>商品</NavLink>
                 <NavLink to="/categories" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>分类</NavLink>
+                <NavLink to="/tags" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>标签</NavLink>
                 <NavLink to="/orders" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>订单</NavLink>
                 <NavLink to="/inventory" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>库存</NavLink>
                 <NavLink to="/bestsellers" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>畅销榜</NavLink>
@@ -92,6 +96,9 @@ function AppRoutes() {
                   <Route path="/categories" element={<CategoryList />} />
                   <Route path="/categories/create" element={<CategoryCreate />} />
                   <Route path="/categories/:id/edit" element={<CategoryEdit />} />
+                  <Route path="/tags" element={<TagList />} />
+                  <Route path="/tags/create" element={<TagCreate />} />
+                  <Route path="/tags/:id/edit" element={<TagEdit />} />
                   <Route path="/orders" element={<OrderList />} />
                   <Route path="/orders/create" element={<OrderCreate />} />
                   <Route path="/orders/:id" element={<OrderShow />} />

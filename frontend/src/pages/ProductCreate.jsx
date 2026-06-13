@@ -1,18 +1,75 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { createProduct } from '../api'
-import { getCategoriesAll } from '../api'
+import { createProduct, getCategoriesAll, getTagsAll, findOrCreateTag } from '../api'
 import { useToast } from '../contexts/ToastContext'
+
+const DEFAULT_COLORS = [
+  '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e',
+  '#06b6d4', '#3b82f6', '#6366f1', '#a855f7', '#ec4899',
+]
 
 export default function ProductCreate() {
   const navigate = useNavigate()
   const { showToast } = useToast()
   const [categories, setCategories] = useState([])
+  const [allTags, setAllTags] = useState([])
+  const [selectedTagIds, setSelectedTagIds] = useState([])
+  const [tagDropdownOpen, setTagDropdownOpen] = useState(false)
+  const [tagSearch, setTagSearch] = useState('')
+  const [newTagName, setNewTagName] = useState('')
+  const [creating, setCreating] = useState(false)
+  const tagDropdownRef = useRef(null)
   const [form, setForm] = useState({ name: '', sku: '', category_id: '', price: '', stock: 0, status: 1 })
 
   useEffect(() => {
     getCategoriesAll().then(setCategories).catch(() => setCategories([]))
+    getTagsAll().then(setAllTags).catch(() => setAllTags([]))
   }, [])
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (tagDropdownRef.current && !tagDropdownRef.current.contains(e.target)) {
+        setTagDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const getTagById = (id) => allTags.find((t) => String(t.id) === String(id))
+
+  const toggleTag = (tagId) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
+    )
+  }
+
+  const removeTag = (tagId) => {
+    setSelectedTagIds((prev) => prev.filter((id) => id !== tagId))
+  }
+
+  const handleCreateTag = async () => {
+    const name = newTagName.trim()
+    if (!name) { showToast('请输入标签名称'); return }
+    if (name.length > 64) { showToast('标签名称不能超过64个字符'); return }
+    const randomColor = DEFAULT_COLORS[Math.floor(Math.random() * DEFAULT_COLORS.length)]
+    try {
+      setCreating(true)
+      const tag = await findOrCreateTag(name, randomColor)
+      if (!allTags.find((t) => t.id === tag.id)) {
+        setAllTags((prev) => [...prev, tag])
+      }
+      if (!selectedTagIds.includes(tag.id)) {
+        setSelectedTagIds((prev) => [...prev, tag.id])
+      }
+      setNewTagName('')
+      showToast(`已添加标签「${tag.name}」`, 'success')
+    } catch (e) {
+      showToast(e.message)
+    } finally {
+      setCreating(false)
+    }
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -23,11 +80,16 @@ export default function ProductCreate() {
       price: form.price,
       stock: form.stock ?? 0,
       status: Number(form.status),
+      tag_ids: selectedTagIds,
     }
     createProduct(payload)
       .then(() => { showToast('商品已创建', 'success'); navigate('/products') })
       .catch((e) => showToast(e.message))
   }
+
+  const filteredTags = tagSearch.trim()
+    ? allTags.filter((t) => t.name.toLowerCase().includes(tagSearch.trim().toLowerCase()) && t.status === 1)
+    : allTags.filter((t) => t.status === 1)
 
   return (
     <div className="space-y-4">
@@ -40,7 +102,7 @@ export default function ProductCreate() {
         <h1 className="text-2xl font-bold text-gray-800">新增商品</h1>
         <p className="text-gray-600 text-base mt-1">填写商品名称、SKU、分类与价格等信息后保存</p>
       </div>
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md border-2 border-gray-200 p-6 sm:p-8 max-w-xl">
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md border-2 border-gray-200 p-6 sm:p-8 max-w-2xl">
         <div className="space-y-5">
           <div>
             <label className="block text-base font-semibold text-gray-800 mb-1.5">分类</label>
@@ -56,6 +118,96 @@ export default function ProductCreate() {
           <div>
             <label className="block text-base font-semibold text-gray-800 mb-1.5">SKU <span className="text-red-500">*</span></label>
             <input type="text" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required placeholder="请输入 SKU 编号" className="mt-0 block w-full rounded-lg border-2 border-gray-300 px-3 py-2.5 text-base text-gray-800 placeholder-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" />
+          </div>
+          <div className="relative" ref={tagDropdownRef}>
+            <label className="block text-base font-semibold text-gray-800 mb-1.5">标签（可多选）</label>
+            <div
+              onClick={() => setTagDropdownOpen((o) => !o)}
+              className="border-2 border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] cursor-pointer bg-white flex flex-wrap items-center gap-1 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+            >
+              {selectedTagIds.length === 0 ? (
+                <span className="text-gray-400">点击选择标签，或在下拉中快速创建新标签</span>
+              ) : (
+                selectedTagIds.map((tid) => {
+                  const t = getTagById(tid)
+                  if (!t) return null
+                  return (
+                    <span
+                      key={tid}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs text-white"
+                      style={{ backgroundColor: t.color }}
+                    >
+                      {t.name}
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); removeTag(tid) }}
+                        className="ml-1 hover:bg-white/30 rounded-full w-4 h-4 flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )
+                })
+              )}
+              <span className="ml-auto text-gray-400 text-sm">▾</span>
+            </div>
+            {tagDropdownOpen && (
+              <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-hidden flex flex-col">
+                <div className="p-2 border-b border-gray-100 flex gap-2">
+                  <input
+                    type="text"
+                    value={tagSearch}
+                    onChange={(e) => setTagSearch(e.target.value)}
+                    placeholder="搜索已有标签..."
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary"
+                  />
+                </div>
+                <div className="p-2 border-b border-gray-100 flex gap-2">
+                  <input
+                    type="text"
+                    value={newTagName}
+                    onChange={(e) => setNewTagName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCreateTag() } }}
+                    placeholder="输入新标签名称快速创建..."
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleCreateTag() }}
+                    disabled={creating || !newTagName.trim()}
+                    className="px-3 py-1 bg-primary text-white rounded text-sm hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  >
+                    {creating ? '创建中...' : '+ 创建'}
+                  </button>
+                </div>
+                <div className="overflow-y-auto flex-1">
+                  {filteredTags.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-gray-400">暂无匹配标签</div>
+                  ) : (
+                    filteredTags.map((t) => {
+                      const checked = selectedTagIds.includes(t.id)
+                      return (
+                        <div
+                          key={t.id}
+                          onClick={() => toggleTag(t.id)}
+                          className={`px-3 py-2 cursor-pointer flex items-center gap-2 text-sm hover:bg-orange-50 ${checked ? 'bg-orange-50' : ''}`}
+                        >
+                          <input type="checkbox" checked={checked} readOnly className="rounded text-primary" />
+                          <span
+                            className="inline-block w-3 h-3 rounded-full shrink-0"
+                            style={{ backgroundColor: t.color }}
+                          />
+                          <span className="text-gray-700 flex-1">{t.name}</span>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="text-gray-500 text-sm mt-1.5">可选择多个标签，也可输入名称即时创建新标签</p>
           </div>
           <div>
             <label className="block text-base font-semibold text-gray-800 mb-1.5">单价 <span className="text-red-500">*</span></label>

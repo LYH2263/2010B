@@ -345,3 +345,89 @@ export async function getProductsOnSale() {
   const data = await r.json();
   return data.data ?? data;
 }
+
+export async function getTags(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/tags' + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getTagsAll(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/tags/all' + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getTagsForSelect() {
+  const r = await fetch(BASE + '/tags/for-select', { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function createTag(data) {
+  const r = await fetch(BASE + '/tags', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function findOrCreateTag(name, color) {
+  const r = await fetch(BASE + '/tags/find-or-create', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify({ name, color }),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function updateTag(id, data) {
+  const r = await fetch(BASE + '/tags/' + id, {
+    method: 'PUT',
+    headers: { ...headers(), 'X-HTTP-Method-Override': 'PUT' },
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function deleteTag(id) {
+  const r = await fetch(BASE + '/tags/' + id, {
+    method: 'DELETE',
+    headers: { ...headers(), 'X-HTTP-Method-Override': 'DELETE' },
+    credentials: 'include',
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+}
