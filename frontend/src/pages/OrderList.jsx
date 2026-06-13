@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getOrders, updateOrderStatus } from '../api'
 import Pagination from '../components/Pagination'
 import { useToast } from '../contexts/ToastContext'
@@ -11,6 +11,7 @@ const statusClass = { pending: 'bg-amber-100 text-amber-800', paid: 'bg-green-10
 const PER_PAGE = 15
 
 export default function OrderList() {
+  const navigate = useNavigate()
   const { showToast } = useToast()
   const { confirm } = useConfirmDialog()
   const [res, setRes] = useState(null)
@@ -176,8 +177,13 @@ export default function OrderList() {
                       <div className="flex flex-wrap items-center gap-2">
                         <Link to={'/orders/' + o.id} className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1.5 rounded-lg font-medium text-sm inline-block">详情</Link>
                         {o.status === 'pending' && <button type="button" onClick={() => handleStatus(o.id, 'paid')} className="bg-primary hover:bg-primary-hover text-white px-3 py-1.5 rounded-lg font-medium text-sm">标记已付款</button>}
-                        {o.status === 'paid' && <button type="button" onClick={() => handleStatus(o.id, 'shipped')} className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1.5 rounded-lg font-medium text-sm">标记已发货</button>}
-                        {o.status === 'shipped' && <button type="button" onClick={() => handleStatus(o.id, 'completed')} className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-medium text-sm">操作已完成</button>}
+                        {o.status === 'paid' && <button type="button" onClick={() => navigate('/orders/' + o.id)} className="bg-primary hover:bg-primary-hover text-white px-3 py-1.5 rounded-lg font-medium text-sm">🚚 登记发货</button>}
+                        {o.status === 'shipped' && (
+                          <div className="flex flex-wrap gap-2">
+                            <button type="button" onClick={() => navigate('/orders/' + o.id)} className="bg-primary-light hover:bg-orange-100 text-primary px-3 py-1.5 rounded-lg font-medium text-sm">查看物流</button>
+                            <button type="button" onClick={() => handleStatus(o.id, 'completed')} className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-medium text-sm">操作已完成</button>
+                          </div>
+                        )}
                         {(o.status === 'pending' || o.status === 'paid') && <button type="button" onClick={() => handleStatus(o.id, 'cancelled')} className="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1.5 rounded-lg font-medium text-sm">取消订单</button>}
                       </div>
                     </td>

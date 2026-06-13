@@ -42,4 +42,14 @@ class Order extends Model
             ->where('type', PointTransaction::TYPE_EARN)
             ->sum('delta');
     }
+
+    public function shipments(): HasMany
+    {
+        return $this->hasMany(Shipment::class);
+    }
+
+    public function shipment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Shipment::class)->latestOfMany();
+    }
 }

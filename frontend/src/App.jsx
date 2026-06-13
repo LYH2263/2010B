@@ -24,6 +24,8 @@ import BestsellerList from './pages/BestsellerList'
 import PointsList from './pages/PointsList'
 import PriceHistoryList from './pages/PriceHistoryList'
 import MemberShow from './pages/MemberShow'
+import ShipmentList from './pages/ShipmentList'
+import ShipmentShow from './pages/ShipmentShow'
 
 function Layout({ children }) {
   const { user, logout } = useAuth()
@@ -50,6 +52,7 @@ function Layout({ children }) {
                 <NavLink to="/inventory" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>库存</NavLink>
                 <NavLink to="/bestsellers" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>畅销榜</NavLink>
                 <NavLink to="/points" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>积分</NavLink>
+                <NavLink to="/shipments" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>运单</NavLink>
                 <NavLink to="/price-histories" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>调价历史</NavLink>
               </div>
             </div>
@@ -110,6 +113,8 @@ function AppRoutes() {
                   <Route path="/points" element={<PointsList />} />
                   <Route path="/price-histories" element={<PriceHistoryList />} />
                   <Route path="/members/:userId" element={<MemberShow />} />
+                  <Route path="/shipments" element={<ShipmentList />} />
+                  <Route path="/shipments/:id" element={<ShipmentShow />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </ProtectedRoute>

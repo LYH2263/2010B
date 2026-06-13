@@ -11,6 +11,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PointController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ShipmentController;
 use Illuminate\Support\Facades\Route;
 
 // 公开路由（无需认证）
@@ -72,4 +73,12 @@ Route::get('price-histories/product/{productId}', [PriceHistoryController::class
 Route::get('price-histories/chart/{productId}', [PriceHistoryController::class, 'chart']);
 Route::post('price-histories/preview', [PriceHistoryController::class, 'preview']);
 Route::post('price-histories/batch-update', [PriceHistoryController::class, 'batchUpdate']);
+
+Route::get('shipments', [ShipmentController::class, 'index']);
+Route::get('shipments/create/order/{order}', [ShipmentController::class, 'create']);
+Route::post('shipments/order/{order}', [ShipmentController::class, 'store']);
+Route::get('shipments/{id}', [ShipmentController::class, 'show']);
+Route::post('shipments/{shipment}/tracks', [ShipmentController::class, 'addTrack']);
+Route::patch('shipments/{shipment}/status', [ShipmentController::class, 'updateStatus']);
+Route::get('shipments/order/{order}', [ShipmentController::class, 'byOrder']);
 });

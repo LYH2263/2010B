@@ -490,3 +490,76 @@ export async function batchUpdatePrice(data) {
   }
   return r.json();
 }
+
+export async function getShipments(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/shipments' + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getShipment(id) {
+  const r = await fetch(BASE + '/shipments/' + id, { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function createShipment(orderId, data) {
+  const r = await fetch(BASE + '/shipments/order/' + orderId, {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function addShipmentTrack(shipmentId, data) {
+  const r = await fetch(BASE + '/shipments/' + shipmentId + '/tracks', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function updateShipmentStatus(shipmentId, status) {
+  const r = await fetch(BASE + '/shipments/' + shipmentId + '/status', {
+    method: 'PATCH',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify({ status }),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function getShipmentByOrder(orderId) {
+  const r = await fetch(BASE + '/shipments/order/' + orderId, { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
