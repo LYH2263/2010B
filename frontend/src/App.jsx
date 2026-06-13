@@ -26,6 +26,7 @@ import PriceHistoryList from './pages/PriceHistoryList'
 import MemberShow from './pages/MemberShow'
 import ShipmentList from './pages/ShipmentList'
 import ShipmentShow from './pages/ShipmentShow'
+import PendingShipments from './pages/PendingShipments'
 import StockTakeList from './pages/StockTakeList'
 import StockTakeShow from './pages/StockTakeShow'
 
@@ -51,6 +52,7 @@ function Layout({ children }) {
                 <NavLink to="/categories" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>分类</NavLink>
                 <NavLink to="/tags" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>标签</NavLink>
                 <NavLink to="/orders" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>订单</NavLink>
+                <NavLink to="/pending-shipments" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>待发货</NavLink>
                 <NavLink to="/inventory" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>库存</NavLink>
                 <NavLink to="/stock-takes" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>盘点</NavLink>
                 <NavLink to="/bestsellers" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>畅销榜</NavLink>
@@ -120,6 +122,7 @@ function AppRoutes() {
                   <Route path="/members/:userId" element={<MemberShow />} />
                   <Route path="/shipments" element={<ShipmentList />} />
                   <Route path="/shipments/:id" element={<ShipmentShow />} />
+                  <Route path="/pending-shipments" element={<PendingShipments />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </ProtectedRoute>

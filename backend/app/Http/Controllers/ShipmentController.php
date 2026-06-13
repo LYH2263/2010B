@@ -139,4 +139,60 @@ class ShipmentController extends Controller
         $shipment = $this->shipmentService->getByOrder($order->id);
         return response()->json($shipment);
     }
+
+    public function batchShip(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'items' => 'required|array|min:1',
+                'items.*.order_id' => 'required|integer',
+                'items.*.tracking_no' => 'required|string|max:64',
+                'items.*.logistics_company' => 'required|string|max:64',
+            ]);
+            $result = $this->shipmentService->batchShip($validated['items']);
+            return response()->json($result);
+        } catch (\Throwable $e) {
+            Log::error('ShipmentController@batchShip', ['error' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    public function importTracking(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'logistics_company' => 'required|string|max:64',
+                'mappings' => 'required|array|min:1',
+                'mappings.*.order_no' => 'required|string',
+                'mappings.*.tracking_no' => 'required|string|max:64',
+            ]);
+            $result = $this->shipmentService->importTrackingNos($validated['mappings'], $validated['logistics_company']);
+            return response()->json($result);
+        } catch (\Throwable $e) {
+            Log::error('ShipmentController@importTracking', ['error' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    public function pendingOrders(Request $request): JsonResponse
+    {
+        $perPage = min((int) $request->query('per_page', 15), 50);
+        $page = max((int) $request->query('page', 1), 1);
+        $filters = [];
+        $orderNo = $request->query('order_no');
+        if (is_string($orderNo) && trim($orderNo) !== '') {
+            $filters['order_no'] = trim($orderNo);
+        }
+        $dateFrom = $request->query('date_from');
+        if (is_string($dateFrom) && trim($dateFrom) !== '') {
+            $filters['date_from'] = trim($dateFrom);
+        }
+        $dateTo = $request->query('date_to');
+        if (is_string($dateTo) && trim($dateTo) !== '') {
+            $filters['date_to'] = trim($dateTo);
+        }
+
+        $orders = $this->shipmentService->pendingOrders($perPage, ['filters' => $filters]);
+        return response()->json($orders);
+    }
 }

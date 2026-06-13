@@ -76,6 +76,9 @@ Route::post('price-histories/preview', [PriceHistoryController::class, 'preview'
 Route::post('price-histories/batch-update', [PriceHistoryController::class, 'batchUpdate']);
 
 Route::get('shipments', [ShipmentController::class, 'index']);
+Route::get('shipments/pending-orders', [ShipmentController::class, 'pendingOrders']);
+Route::post('shipments/batch-ship', [ShipmentController::class, 'batchShip']);
+Route::post('shipments/import-tracking', [ShipmentController::class, 'importTracking']);
 Route::get('shipments/create/order/{order}', [ShipmentController::class, 'create']);
 Route::post('shipments/order/{order}', [ShipmentController::class, 'store']);
 Route::get('shipments/{id}', [ShipmentController::class, 'show']);
