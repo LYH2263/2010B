@@ -17,6 +17,7 @@ import OrderCreate from './pages/OrderCreate'
 import OrderShow from './pages/OrderShow'
 import InventoryList from './pages/InventoryList'
 import InventoryAdjust from './pages/InventoryAdjust'
+import BestsellerList from './pages/BestsellerList'
 
 function Layout({ children }) {
   const { user, logout } = useAuth()
@@ -40,6 +41,7 @@ function Layout({ children }) {
                 <NavLink to="/categories" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>分类</NavLink>
                 <NavLink to="/orders" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>订单</NavLink>
                 <NavLink to="/inventory" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>库存</NavLink>
+                <NavLink to="/bestsellers" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>畅销榜</NavLink>
               </div>
             </div>
             {user && (
@@ -92,6 +94,7 @@ function AppRoutes() {
                   <Route path="/orders/:id" element={<OrderShow />} />
                   <Route path="/inventory" element={<InventoryList />} />
                   <Route path="/inventory/:productId/adjust" element={<InventoryAdjust />} />
+                  <Route path="/bestsellers" element={<BestsellerList />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </ProtectedRoute>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BestsellerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
@@ -16,6 +17,7 @@ Route::post('logout', [AuthController::class, 'logout']);
 Route::middleware(['auth:web'])->group(function () {
     Route::get('me', [AuthController::class, 'me']);
     Route::get('/', [DashboardController::class, 'index']);
+    Route::get('bestsellers', [BestsellerController::class, 'index']);
 Route::get('products', [ProductController::class, 'index']);
 Route::get('products/create', [ProductController::class, 'create']);
 Route::post('products', [ProductController::class, 'store']);
