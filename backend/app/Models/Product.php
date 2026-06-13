@@ -37,6 +37,11 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function priceHistories(): HasMany
+    {
+        return $this->hasMany(PriceHistory::class)->orderBy('created_at', 'desc');
+    }
+
     public function scopeOnSale($query)
     {
         return $query->where('status', self::STATUS_ACTIVE);

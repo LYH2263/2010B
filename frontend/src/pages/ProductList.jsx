@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { getProducts, getCategoriesAll, deleteProduct, getTagsAll } from '../api'
 import Pagination from '../components/Pagination'
+import BatchPriceChange from '../components/BatchPriceChange'
 import { useToast } from '../contexts/ToastContext'
 import { useConfirmDialog } from '../contexts/ConfirmDialogContext'
 
@@ -25,6 +26,8 @@ export default function ProductList() {
   const [appliedTagMode, setAppliedTagMode] = useState('any')
   const [tagDropdownOpen, setTagDropdownOpen] = useState(false)
   const [tagSearch, setTagSearch] = useState('')
+  const [selectedProductIds, setSelectedProductIds] = useState([])
+  const [showBatchPrice, setShowBatchPrice] = useState(false)
   const tagDropdownRef = useRef(null)
 
   const load = (p = page) => {
@@ -97,6 +100,31 @@ export default function ProductList() {
     deleteProduct(id).then(() => { showToast('商品已删除', 'success'); load(page) }).catch((e) => showToast(e.message))
   }
 
+  const toggleSelect = (productId) => {
+    setSelectedProductIds((prev) =>
+      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
+    )
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedProductIds.length === list.length) {
+      setSelectedProductIds([])
+    } else {
+      setSelectedProductIds(list.map((p) => p.id))
+    }
+  }
+
+  const selectedProducts = list?.filter((p) => selectedProductIds.includes(p.id)) ?? []
+
+  const handleBatchPriceSuccess = () => {
+    setSelectedProductIds([])
+    load(page)
+  }
+
+  useEffect(() => {
+    setSelectedProductIds([])
+  }, [appliedCategoryId, appliedKeyword, appliedTagIds, appliedTagMode, page])
+
   if (err) return <div className="p-4 text-center text-gray-600">加载失败，请 <button type="button" onClick={() => { setErr(null); load(page) }} className="text-primary hover:underline">重试</button></div>
   if (!res) return <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent" /></div>
 
@@ -118,7 +146,18 @@ export default function ProductList() {
           <h1 className="text-xl font-bold text-gray-800">商品列表</h1>
           <p className="text-gray-500 text-sm mt-0.5">管理全部商品，支持按分类、标签筛选与搜索名称/SKU</p>
         </div>
-        <Link to="/products/create" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg font-medium shrink-0">新增商品</Link>
+        <div className="flex gap-2">
+          {selectedProductIds.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowBatchPrice(true)}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium shrink-0 text-sm"
+            >
+              批量改价（{selectedProductIds.length}）
+            </button>
+          )}
+          <Link to="/products/create" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg font-medium shrink-0">新增商品</Link>
+        </div>
       </div>
 
       <form onSubmit={handleSearch} className="bg-white rounded-xl shadow border border-gray-100 p-4 flex flex-wrap items-end gap-3">
@@ -293,9 +332,17 @@ export default function ProductList() {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px] divide-y divide-gray-200">
+              <table className="w-full min-w-[1020px] divide-y divide-gray-200">
                 <thead className="bg-primary-light">
                   <tr>
+                    <th className="px-4 py-3 w-12">
+                      <input
+                        type="checkbox"
+                        checked={list.length > 0 && selectedProductIds.length === list.length}
+                        onChange={toggleSelectAll}
+                        className="rounded text-primary"
+                      />
+                    </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">ID</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">名称</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">标签</th>
@@ -308,8 +355,18 @@ export default function ProductList() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {list.map((p) => (
-                    <tr key={p.id} className="hover:bg-orange-50">
+                  {list.map((p) => {
+                    const isSelected = selectedProductIds.includes(p.id)
+                    return (
+                    <tr key={p.id} className={`hover:bg-orange-50 ${isSelected ? 'bg-orange-50/70' : ''}`}>
+                      <td className="px-4 py-3">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelect(p.id)}
+                          className="rounded text-primary"
+                        />
+                      </td>
                       <td className="px-4 py-3 text-sm text-gray-500">{p.id}</td>
                       <td className="px-4 py-3 text-sm font-medium">{p.name}</td>
                       <td className="px-4 py-3">
@@ -339,7 +396,8 @@ export default function ProductList() {
                         <button type="button" onClick={() => handleDelete(p.id, p.name)} className="text-red-600 hover:underline ml-2">删除</button>
                       </td>
                     </tr>
-                  ))}
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -350,6 +408,14 @@ export default function ProductList() {
           </>
         )}
       </div>
+
+      {showBatchPrice && (
+        <BatchPriceChange
+          selectedProducts={selectedProducts}
+          onClose={() => setShowBatchPrice(false)}
+          onSuccess={handleBatchPriceSuccess}
+        />
+      )}
     </div>
   )
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BestsellerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PriceHistoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TagController;
@@ -65,4 +66,10 @@ Route::get('points/ranking', [PointController::class, 'ranking']);
 
 Route::get('users', [UserController::class, 'index']);
 Route::get('users/{id}', [UserController::class, 'show']);
+
+Route::get('price-histories', [PriceHistoryController::class, 'index']);
+Route::get('price-histories/product/{productId}', [PriceHistoryController::class, 'byProduct']);
+Route::get('price-histories/chart/{productId}', [PriceHistoryController::class, 'chart']);
+Route::post('price-histories/preview', [PriceHistoryController::class, 'preview']);
+Route::post('price-histories/batch-update', [PriceHistoryController::class, 'batchUpdate']);
 });

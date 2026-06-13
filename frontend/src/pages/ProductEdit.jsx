@@ -21,6 +21,7 @@ export default function ProductEdit() {
   const [err, setErr] = useState(null)
   const [form, setForm] = useState(null)
   const [selectedTagIds, setSelectedTagIds] = useState([])
+  const [priceReason, setPriceReason] = useState('')
   const [tagDropdownOpen, setTagDropdownOpen] = useState(false)
   const [tagSearch, setTagSearch] = useState('')
   const [newTagName, setNewTagName] = useState('')
@@ -86,7 +87,7 @@ export default function ProductEdit() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    updateProduct(id, {
+    const payload = {
       name: form.name,
       sku: form.sku,
       category_id: form.category_id || null,
@@ -94,7 +95,11 @@ export default function ProductEdit() {
       stock: form.stock,
       status: Number(form.status),
       tag_ids: selectedTagIds,
-    })
+    }
+    if (parseFloat(form.price) !== parseFloat(product.price) && priceReason.trim()) {
+      payload.price_reason = priceReason.trim()
+    }
+    updateProduct(id, payload)
       .then(() => { showToast('商品已保存', 'success'); backTo() })
       .catch((e) => showToast(e.message))
   }
@@ -227,6 +232,18 @@ export default function ProductEdit() {
           <div>
             <label className="block text-base font-semibold text-gray-800 mb-1.5">单价 <span className="text-red-500">*</span></label>
             <input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required placeholder="0.00" className="block w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2.5 text-base text-gray-800 placeholder-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" />
+            {parseFloat(form.price) !== parseFloat(product.price) && (
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">调价原因 <span className="text-gray-400">（可选）</span></label>
+                <textarea
+                  value={priceReason}
+                  onChange={(e) => setPriceReason(e.target.value)}
+                  placeholder="请输入调价原因，便于后续追溯"
+                  rows={2}
+                  className="block w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none resize-none"
+                />
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-base font-semibold text-gray-800 mb-1.5">库存</label>

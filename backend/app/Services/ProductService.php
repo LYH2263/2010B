@@ -2,12 +2,17 @@
 
 namespace App\Services;
 
+use App\Models\PriceHistory;
 use App\Models\Product;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class ProductService
 {
+    public function __construct(
+        private PriceHistoryService $priceHistoryService
+    ) {}
+
     /**
      * @param array{filters?: array{keyword?: string, tag_ids?: int[], tag_mode?: string}} $options
      */
@@ -59,9 +64,24 @@ class ProductService
     public function update(Product $product, array $data): Product
     {
         return DB::transaction(function () use ($product, $data) {
+            $oldPrice = (float) $product->price;
             $tagIds = $data['tag_ids'] ?? null;
-            unset($data['tag_ids']);
+            $reason = $data['price_reason'] ?? null;
+            unset($data['tag_ids'], $data['price_reason']);
+
             $product->update($data);
+
+            $newPrice = (float) $product->price;
+            if (abs($newPrice - $oldPrice) >= 0.01) {
+                $this->priceHistoryService->record(
+                    product: $product,
+                    oldPrice: $oldPrice,
+                    newPrice: $newPrice,
+                    changeType: PriceHistory::TYPE_FIXED,
+                    reason: $reason
+                );
+            }
+
             if (is_array($tagIds)) {
                 $product->tags()->sync($tagIds);
             }

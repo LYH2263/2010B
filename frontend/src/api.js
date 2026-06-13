@@ -431,3 +431,62 @@ export async function deleteTag(id) {
     throw new Error(await r.text());
   }
 }
+
+export async function getPriceHistories(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/price-histories' + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getPriceHistoriesByProduct(productId, params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/price-histories/product/' + productId + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getPriceChart(productId) {
+  const r = await fetch(BASE + '/price-histories/chart/' + productId, { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function previewPriceChange(data) {
+  const r = await fetch(BASE + '/price-histories/preview', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function batchUpdatePrice(data) {
+  const r = await fetch(BASE + '/price-histories/batch-update', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
