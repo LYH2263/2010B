@@ -21,12 +21,12 @@ export default function CategoryList() {
   const handleDelete = async (id, name) => {
     const ok = await confirm({
       title: '删除分类',
-      message: `确定删除「${name}」？若分类下仍有关联商品将删除失败。`,
+      message: `确定删除「${name}」？删除后将移入回收站，可在回收站中恢复。`,
       confirmText: '确认删除',
       tone: 'danger',
     })
     if (!ok) return
-    deleteCategory(id).then(() => { showToast('分类已删除', 'success'); load(page) }).catch((e) => showToast(e.message))
+    deleteCategory(id).then(() => { showToast('分类已移入回收站', 'success'); load(page) }).catch((e) => showToast(e.message))
   }
 
   if (err) return <div className="p-4 text-center text-gray-600">加载失败，请 <button type="button" onClick={() => { setErr(null); load(page) }} className="text-primary hover:underline">重试</button></div>

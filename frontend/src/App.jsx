@@ -29,6 +29,7 @@ import ShipmentShow from './pages/ShipmentShow'
 import PendingShipments from './pages/PendingShipments'
 import StockTakeList from './pages/StockTakeList'
 import StockTakeShow from './pages/StockTakeShow'
+import TrashList from './pages/TrashList'
 
 function Layout({ children }) {
   const { user, logout } = useAuth()
@@ -59,6 +60,7 @@ function Layout({ children }) {
                 <NavLink to="/points" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>积分</NavLink>
                 <NavLink to="/shipments" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>运单</NavLink>
                 <NavLink to="/price-histories" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>调价历史</NavLink>
+                <NavLink to="/trash" className={({ isActive }) => `text-lg font-medium ${isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'}`}>回收站</NavLink>
               </div>
             </div>
             {user && (
@@ -123,6 +125,7 @@ function AppRoutes() {
                   <Route path="/shipments" element={<ShipmentList />} />
                   <Route path="/shipments/:id" element={<ShipmentShow />} />
                   <Route path="/pending-shipments" element={<PendingShipments />} />
+                  <Route path="/trash" element={<TrashList />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </ProtectedRoute>

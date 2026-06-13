@@ -92,12 +92,12 @@ export default function ProductList() {
   const handleDelete = async (id, name) => {
     const ok = await confirm({
       title: '删除商品',
-      message: `确定删除「${name}」？删除后不可恢复。`,
+      message: `确定删除「${name}」？删除后将移入回收站，可在回收站中恢复。`,
       confirmText: '确认删除',
       tone: 'danger',
     })
     if (!ok) return
-    deleteProduct(id).then(() => { showToast('商品已删除', 'success'); load(page) }).catch((e) => showToast(e.message))
+    deleteProduct(id).then(() => { showToast('商品已移入回收站', 'success'); load(page) }).catch((e) => showToast(e.message))
   }
 
   const toggleSelect = (productId) => {

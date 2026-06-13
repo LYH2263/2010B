@@ -13,6 +13,7 @@ use App\Http\Controllers\PointController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\StockTakeController;
+use App\Http\Controllers\TrashController;
 use Illuminate\Support\Facades\Route;
 
 // 公开路由（无需认证）
@@ -91,4 +92,11 @@ Route::post('stock-takes', [StockTakeController::class, 'store']);
 Route::get('stock-takes/{id}', [StockTakeController::class, 'show']);
 Route::patch('stock-takes/{stockTakeId}/items/{itemId}', [StockTakeController::class, 'updateItem']);
 Route::post('stock-takes/{id}/complete', [StockTakeController::class, 'complete']);
+
+Route::get('trash/products', [TrashController::class, 'products']);
+Route::get('trash/categories', [TrashController::class, 'categories']);
+Route::post('trash/products/{id}/restore', [TrashController::class, 'restoreProduct']);
+Route::post('trash/categories/{id}/restore', [TrashController::class, 'restoreCategory']);
+Route::delete('trash/products/{id}/force', [TrashController::class, 'forceDeleteProduct']);
+Route::delete('trash/categories/{id}/force', [TrashController::class, 'forceDeleteCategory']);
 });

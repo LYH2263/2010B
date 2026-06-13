@@ -666,3 +666,77 @@ export async function completeStockTake(id) {
   }
   return r.json();
 }
+
+export async function getTrashProducts(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/trash/products' + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function getTrashCategories(params = {}) {
+  const q = new URLSearchParams(params).toString();
+  const r = await fetch(BASE + '/trash/categories' + (q ? '?' + q : ''), { headers: headers(), credentials: 'include' });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    throw new Error(await r.text());
+  }
+  return r.json();
+}
+
+export async function restoreProduct(id) {
+  const r = await fetch(BASE + '/trash/products/' + id + '/restore', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function restoreCategory(id) {
+  const r = await fetch(BASE + '/trash/categories/' + id + '/restore', {
+    method: 'POST',
+    headers: headers(),
+    credentials: 'include',
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+  return r.json();
+}
+
+export async function forceDeleteProduct(id) {
+  const r = await fetch(BASE + '/trash/products/' + id + '/force', {
+    method: 'DELETE',
+    headers: { ...headers(), 'X-HTTP-Method-Override': 'DELETE' },
+    credentials: 'include',
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+}
+
+export async function forceDeleteCategory(id) {
+  const r = await fetch(BASE + '/trash/categories/' + id + '/force', {
+    method: 'DELETE',
+    headers: { ...headers(), 'X-HTTP-Method-Override': 'DELETE' },
+    credentials: 'include',
+  });
+  if (!r.ok) {
+    if (r.status === 401) throw new Error('UNAUTHORIZED');
+    const j = await r.json().catch(() => ({}));
+    throw new Error(j.message || await r.text());
+  }
+}

@@ -30,9 +30,6 @@ class CategoryService
 
     public function delete(Category $category): void
     {
-        if (Product::where('category_id', $category->id)->exists()) {
-            throw new \InvalidArgumentException('该分类下存在商品，无法删除。请先将该分类下的商品移至其他分类或删除后再试。');
-        }
         $category->delete();
     }
 

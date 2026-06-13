@@ -45,7 +45,7 @@ class InventoryService
     public function stats(): array
     {
         $totalStock = Product::sum('stock');
-        $totalValue = DB::table('products')->selectRaw('SUM(price * stock) as v')->value('v') ?? 0;
+        $totalValue = Product::selectRaw('SUM(price * stock) as v')->value('v') ?? 0;
         $lowStockCount = Product::where('stock', '<=', 10)->count();
         return [
             'total_stock' => (int) $totalStock,
