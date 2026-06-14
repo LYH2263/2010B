@@ -57,7 +57,7 @@ class PriceHistoryController extends Controller
                 'product_ids.*' => 'required|integer|exists:products,id',
                 'change_type' => ['required', 'string', Rule::in(['fixed', 'percentage', 'amount'])],
                 'value' => 'required|numeric|min:0',
-                'direction' => ['required', 'string', Rule::in(['up', 'down']),
+                'direction' => ['required', 'string', Rule::in(['up', 'down'])],
                 'reason' => 'nullable|string|max:500',
             ]);
 
