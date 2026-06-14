@@ -116,8 +116,6 @@ export default function ProductList() {
     }
   }
 
-  const selectedProducts = list?.filter((p) => selectedProductIds.includes(p.id)) ?? []
-
   const handleBatchPriceSuccess = () => {
     setSelectedProductIds([])
     load(page)
@@ -134,6 +132,8 @@ export default function ProductList() {
   const total = res.total ?? list.length
   const currentPage = res.current_page ?? 1
   const lastPage = res.last_page ?? 1
+
+  const selectedProducts = list?.filter((p) => selectedProductIds.includes(p.id)) ?? []
 
   const filteredTags = tagSearch.trim()
     ? allTags.filter((t) => t.name.toLowerCase().includes(tagSearch.trim().toLowerCase()))
